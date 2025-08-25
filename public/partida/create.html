@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Partida</title>
+</head>
+<body>
+    <h1>Crear Nueva Partida</h1>
+    <form id="create-partida-form">
+        <label for="resultado">Resultado:</label><br>
+        <input type="text" id="resultado" name="resultado" required><br><br>
+        
+        <label for="fecha_partida">Fecha de la partida:</label><br>
+        <input type="datetime-local" id="fecha_partida" name="fecha_partida" required><br><br>
+        
+        <label for="torneoId">ID del Torneo:</label><br>
+        <input type="number" id="torneoId" name="torneoId" required><br><br>
+        
+        <button type="submit">Crear Partida</button>
+    </form>
+    <script>
+        document.getElementById('create-partida-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+            const resultado = document.getElementById('resultado').value;
+            const fecha_partida = new Date(document.getElementById('fecha_partida').value).toISOString();
+            const torneoId = parseInt(document.getElementById('torneoId').value);
+
+            const nuevaPartida = {
+                resultado,
+                fecha_partida,
+                torneoId
+            };
+
+            fetch('http://localhost:3000/partidas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(nuevaPartida),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Partida creada:', data);
+                alert('Partida creada con éxito!');
+            })
+            .catch(error => console.error('Error al crear la partida:', error));
+        });
+    </script>
+</body>
+</html>

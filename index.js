@@ -1,37 +1,26 @@
-// Importamos express
 import express from 'express';
+import partidaRoutes from './Routes/partida.routes.js'; 
+import torneoRoutes from './Routes/torneo.routes.js';
+import usuarioRoutes from './Routes/usuario.routes.js';
+import cors from 'cors';
 
 const app = express();
-app.use(express.json()); // Middleware para leer JSON
 
-// Ruta principal de bienvenida
+// Middleware
+app.use(express.static('public'));
+app.use(express.json()); // para leer JSON
+app.use(cors()); // para permitir CORS
+
+app.use('/partidas', partidaRoutes);
+app.use('/torneo', torneoRoutes);
+app.use('/usuario', usuarioRoutes);
+
 app.get('/', (req, res) => {
-  res.json({ mensaje: 'Bienvenido a la API de MAPTV' });
-});
-
-// Rutas para la entidad PARTIDA
-
-// Obtener todas las partidas (GET)
-app.get('/partida', (req, res) => {
-  res.json({ mensaje: 'Esta es la ruta GET de mi entidad PARTIDA' });
-});
-
-// Crear una nueva partida (POST)
-app.post('/partida', (req, res) => {
-  res.json({ mensaje: 'Esta es la ruta POST de mi entidad PARTIDA' });
-});
-
-// Modificar una partida por su ID (PUT)
-app.put('/partida/:id', (req, res) => {
-  res.json({ mensaje: `Esta es la ruta PUT de mi entidad PARTIDA con id ${req.params.id}` });
-});
-
-// Eliminar una partida por su ID (DELETE)
-app.delete('/partida/:id', (req, res) => {
-  res.json({ mensaje: `Esta es la ruta DELETE de mi entidad PARTIDA con id ${req.params.id}` });
+  res.send('¡Bienvenido a la API de gestión de torneos!');
 });
 
 // Iniciar el servidor
+const hostname = '0.0.0.0'; // Escuchar en todas las interfaces de red
 app.listen(3000, () => {
-  console.log('Servidor corriendo en http://localhost:3000');
+  console.log('Servidor escuchando en http://localhost:${3000}');
 });

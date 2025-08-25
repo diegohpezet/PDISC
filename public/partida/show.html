@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver y Eliminar Partida</title>
+</head>
+<body>
+    <h1>Ver Partida</h1>
+    <p>ID de la partida: <span id="partida-id">1</span></p>
+    <button id="delete-button">Eliminar Partida</button>
+    <script>
+        const partidaId = 1; // ID de la partida a mostrar y eliminar
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch(`http://localhost:3000/partidas/${partidaId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Partida no encontrada');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Datos de la partida:', data);
+                })
+                .catch(error => console.error('Error al obtener la partida:', error));
+        });
+
+        document.getElementById('delete-button').addEventListener('click', () => {
+            fetch(`http://localhost:3000/partidas/${partidaId}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.status === 204) {
+                    console.log('Partida eliminada con éxito.');
+                    alert('Partida eliminada con éxito!');
+                } else {
+                    throw new Error('No se pudo eliminar la partida.');
+                }
+            })
+            .catch(error => console.error('Error al eliminar la partida:', error));
+        });
+    </script>
+</body>
+</html>

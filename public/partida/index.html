@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Partidas</title>
+</head>
+<body>
+    <h1>Lista de Partidas</h1>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('http://localhost:3000/partidas')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Listado de partidas:', data);
+                    // Puedes mostrar los datos en la página si quieres, por ejemplo:
+                    // const lista = document.createElement('ul');
+                    // data.forEach(partida => {
+                    //     const item = document.createElement('li');
+                    //     item.textContent = `ID: ${partida.id_partida}, Resultado: ${partida.resultado}`;
+                    //     lista.appendChild(item);
+                    // });
+                    // document.body.appendChild(lista);
+                })
+                .catch(error => console.error('Error al obtener las partidas:', error));
+        });
+    </script>
+</body>
+</html>
