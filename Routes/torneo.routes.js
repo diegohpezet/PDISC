@@ -41,7 +41,9 @@ router.post('/', asyncHandler(async (req, res) => {
       reglas,
       premios,
       tipo_torneo,
-      creadorId,
+      creador:{
+        connect: { id_usuario: creadorId } // Conecta el torneo al usuario por su ID
+      },
     },
   });
   res.status(201).json(nuevoTorneo);

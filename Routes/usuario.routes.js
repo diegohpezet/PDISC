@@ -32,7 +32,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 router.post('/', asyncHandler(async (req, res) => {
   const { email, nombre, contrasena, ELO } = req.body;
   if (!email || !nombre || !contrasena) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios: email, nombre y contrasena.' });
+    return res.status(400).json({ error: 'Faltan campos obligatorios: email, nombre y contraseña.' });
   }
   const nuevoUsuario = await prisma.usuario.create({
     data: {
