@@ -3,5 +3,4 @@ function notFound(req, res, next) {
     message: 'Recurso no encontrado' 
   });
 }
-
-module.exports = notFound; 
+export default notFound;

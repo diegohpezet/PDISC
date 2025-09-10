@@ -17,7 +17,7 @@ model Usuario {
       id_usuario    Int      @id @default(autoincrement()) @map("id_usuario")
       email         String   @unique
       nombre        String
-      contrasena    String   @map("contrasena")
+      password   String   @map("password")
       ELO           Int?
 
       torneosCreados  Torneo[]
