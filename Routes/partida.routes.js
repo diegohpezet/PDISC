@@ -1,40 +1,115 @@
 import express from 'express';
+import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
-// Obtener todas las partidas (GET)
-router.get('/partida', (req, res) => {
-  res.json({ 
-    message: 'Esta es la ruta GET de mi entidad PARTIDA' 
-   });
-});
+// Middleware para manejar excepciones en promesas asincrónicas
+const asyncHandler = fn => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
 
-//Mensaje con ID
-router.get('/partida/:id', (req, res) =>{
-    res.json({
-        menssage: 'Esta es la ruta GET de mi entidad PARTIDA con el ID: ${req.params.id}'
+// GET /partidas
+// Obtener todas las partidas, con filtro opcional por torneoId
+router.get('/', asyncHandler(async (req, res) => {
+  const { torneoId } = req.query;
+
+  const partidas = await prisma.partida.findMany({
+    where: {
+      torneoId: torneoId ? parseInt(torneoId) : undefined,
+    },
+  });
+  res.json(partidas);
+}));
+
+// GET /partidas/:id
+// Obtener una partida por ID
+router.get('/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const partida = await prisma.partida.findUnique({
+    where: {
+      id_partida: parseInt(id),
+    },
+  });
+
+  if (partida) {
+    res.json(partida);
+  } else {
+    res.status(404).json({ error: 'Partida no encontrada.' });
+  }
+}));
+
+// POST /partidas
+// Crear una nueva partida
+router.post('/', asyncHandler(async (req, res) => {
+  const { resultado, fecha_partida, torneoId } = req.body;
+
+  if (!torneoId) {
+    return res.status(400).json({ error: 'El ID del torneo es obligatorio.' });
+  }
+
+  const nuevaPartida = await prisma.partida.create({
+    data: {
+      resultado,
+      fecha_partida: new Date(fecha_partida),
+      torneo: {
+        connect: {
+          id_torneo: torneoId,
+        },
+      },
+    },
+  });
+
+  res.status(201).json(nuevaPartida);
+}));
+
+// PUT /partidas/:id
+// Actualizar una partida
+router.put('/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { resultado, fecha_partida, torneoId } = req.body;
+
+  try {
+    const partidaActualizada = await prisma.partida.update({
+      where: {
+        id_partida: parseInt(id),
+      },
+      data: {
+        resultado,
+        fecha_partida: fecha_partida ? new Date(fecha_partida) : undefined,
+        torneo: torneoId ? { connect: { id_torneo: torneoId } } : undefined,
+      },
     });
-});
 
-// Crear una nueva partida (POST)
-router.post('/partida', (req, res) => {
-  res.json({ 
-    message: 'Esta es la ruta POST de mi entidad PARTIDA' 
-   });
-});
+    res.json(partidaActualizada);
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Partida no encontrada para actualizar.' });
+    }
+    throw error;
+  }
+}));
 
-// Modificar una partida por su ID (PUT)
-router.put('/partida/:id', (req, res) => {
-  res.json({ 
-    message: `Esta es la ruta PUT de mi entidad PARTIDA con id ${req.params.id}` 
-   });
-});
+// DELETE /partidas/:id
+// Eliminar una partida
+router.delete('/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
-// Eliminar una partida por su ID (DELETE)
-router.delete('/partida/:id', (req, res) => {
-  res.json({ 
-    message: `Esta es la ruta DELETE de mi entidad PARTIDA con id ${req.params.id}` 
-   });
-});
+  try {
+    await prisma.partida.delete({
+      where: {
+        id_partida: parseInt(id),
+      },
+    });
 
-export default router; //se exporta para llamarlo al index.js
+    res.status(204).send();
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Partida no encontrada para eliminar.' });
+    }
+    throw error;
+  }
+}));
+
+export default router;

@@ -1,40 +1,80 @@
-import express from "express"; 
+import express from 'express';
+import { PrismaClient } from '@prisma/client';
+import verifyToken from '../middlewares/auth.js';
 
 const router = express.Router();
+const prisma = new PrismaClient();
 
-// Muestra todos los torneos 
-router.get('/torneo', (req, res) => {
-  res.json({ 
-    message: 'Esta es la ruta GET de mi entidad TORNEO' 
-   });
-});
+// Middleware para manejar excepciones en promesas asincrónicas
+const asyncHandler = fn => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
 
-//Mensaje con ID
-router.get('/torneo/:id', (req, res) =>{
-    res.json({
-        menssage: 'Esta es la ruta GET de mi entidad TORNEO con la ID: ${req.params.id}'
-    });
-});
+// GET /torneo
+router.get('/', asyncHandler(async (req, res) => {
+  const torneos = await prisma.torneo.findMany();
+  res.json(torneos);
+}));
 
-// Crear un nuevo torneo 
-router.post('/torneo', (req, res) => {
-  res.json({ 
-    message: 'Esta es la ruta POST de mi entidad TORNEO' 
-   });
-});
+// GET /torneo/:id
+router.get('/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const torneo = await prisma.torneo.findUnique({
+    where: { id_torneo: parseInt(id) },
+  });
+  if (torneo) {
+    res.json(torneo);
+  } else {
+    res.status(404).json({ error: 'Torneo no encontrado.' });
+  }
+}));
 
-// Modifica un torneo por su ID 
-router.put('/torneo/:id', (req, res) => {
-  res.json({ 
-    message: `Esta es la ruta PUT de mi entidad TORNEO con el ID: ${req.params.id}` 
-   });
-});
+// POST /torneo
+router.post('/',verifyToken, asyncHandler(async (req, res) => { //Solo los usuarios autenticados pueden crear torneos 
+  const { nombre, fecha_inicio, reglas, premios, tipo_torneo, creadorId } = req.body;
+  if (!nombre || !fecha_inicio || !creadorId) {
+    return res.status(400).json({ error: 'Faltan campos obligatorios: nombre, fecha_inicio, y creadorId.' });
+  }
+  const nuevoTorneo = await prisma.torneo.create({
+    data: {
+      nombre,
+      fecha_inicio: new Date(fecha_inicio),
+      reglas,
+      premios,
+      tipo_torneo,
+      creador:{
+        connect: { id_usuario: creadorId } // Conecta el torneo al usuario por su ID
+      },
+    },
+  });
+  res.status(201).json(nuevoTorneo);
+}));
 
-// Elimina un torneo por su ID 
-router.delete('/partida/:id', (req, res) => {
-  res.json({ 
-    message: `Esta es la ruta DELETE de la entidad TORNEO con la id: ${req.params.id}` 
-   });
-});
+// PUT /torneo/:id
+router.put('/:id', verifyToken, asyncHandler(async (req, res) => { //Solo los usuarios autenticados pueden actualizar torneos
+  const { id } = req.params;
+  const { nombre, fecha_inicio, reglas, premios, tipo_torneo, creadorId } = req.body;
+  const torneoActualizado = await prisma.torneo.update({
+    where: { id_torneo: parseInt(id) },
+    data: {
+      nombre,
+      fecha_inicio: fecha_inicio ? new Date(fecha_inicio) : undefined,
+      reglas,
+      premios,
+      tipo_torneo,
+      creadorId,
+    },
+  });
+  res.json(torneoActualizado);
+}));
 
-export default router; //se exporta para llamarlo al index.js
+// DELETE /torneo/:id
+router.delete('/:id',verifyToken, asyncHandler(async (req, res) => { //Solo los usuarios autenticados pueden eliminar torneos 
+  const { id } = req.params;
+  await prisma.torneo.delete({
+    where: { id_torneo: parseInt(id) },
+  });
+  res.status(204).send();
+}));
+
+export default router;
