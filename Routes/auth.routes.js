@@ -3,8 +3,45 @@ import jwt from 'jsonwebtoken';
 import { Router } from "express";
 import prisma from "../lib/prisma.js";
 import EnviarMensaje from '../services/emails.js';
+import { nanoid } from 'nanoid';
 
-const router = Router();
+const router = Router();   
+
+//POST /auth/guest-login - login de invitado
+router.post('/guest-login', async (req, res) => {
+  try {
+    const { nombre } = req.body;
+
+    ///crea un nombre generico si no se proporciona 
+    const guestName = nombre || `Invitado-${nanoid(8)}`; //genera un id unico de 8 caracteres
+    
+    //crea el usuario invitado en la base de datos
+    const guestUser = await prisma.usuario.create({
+      data: {
+        nombre: guestName,
+        isGuest: true, //marca como invitado
+        }
+    });
+
+    //genera un token JWT para el usuario invitado
+    const token = jwt.sign(
+      {id_usuario: guestUser.id_usuario, isGuest: true},
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' } //el token es valido por una hora
+    );
+
+    return res.status(201).json({
+      message: 'Acceso de invitado exitoso',
+      token: token,
+      nombre: guestUser.nombre 
+    });
+
+  } catch (error) {
+    console.error('Error en /guest-login:', error);
+    return res.status(500).json({ error: 'Error al registrarse como invitado' });
+  }
+});
+
 
 //POST /auth/register - registro de usuario 
 router.post('/register', async (req, res) => {
@@ -27,7 +64,7 @@ router.post('/register', async (req, res) => {
       nombre, 
     },
   });
-  await EnviarMensaje.EnviarMensaje(email, nombre); //envia el email de bienvenida
+  await EnviarMensaje(email, nombre); //envia el email de bienvenida
 
   return res.status(201).json({ message: 'Usuario creado', userId: newUser.id_usuario });
 })
@@ -41,7 +78,11 @@ router.post('/login', async (req, res) => {
     });
 
     if (!user) {
-        return res.status(401).json({ error: 'Credenciales inválidas' });
+        return res.status(401).json({ error: 'Credenciales Inválidas :(' });
+    }
+
+    if (user.isGuest) {
+      return res.status(401).json({ error: 'Los usuarios invitados no pueden iniciar sesión. Por favor, regístrese.' });
     }
 
     //verifica la contraseña
@@ -51,7 +92,7 @@ router.post('/login', async (req, res) => {
     }
 
     //genera un Token JWT
-    const token = jwt.sign({ userId: user.id, email: user.email },
+    const token = jwt.sign({ userId: user.id_usuario, email: user.email },
         process.env.JWT_SECRET, { expiresIn: '1h' });
 
         return res.status(200).json({ message: 'login exitoso', token });

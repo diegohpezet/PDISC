@@ -15,10 +15,11 @@ datasource db {
 //Modelo para la entidad USUARIO
 model Usuario {
       id_usuario    Int      @id @default(autoincrement()) @map("id_usuario")
-      email         String   @unique
+      email         String?  @unique
       nombre        String
-      password   String   @map("password")
+      password   String?  @map("password")
       ELO           Int?
+isGuest Boolean   @default(false) @map("isGuest")
 
       torneosCreados  Torneo[]
       inscripciones   Inscripcion[]

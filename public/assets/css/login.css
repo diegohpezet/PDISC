@@ -1,58 +1,66 @@
-@import url('https://fonts.googleapis.com/css2?family=Amarante&family=Staatliches&display=swap');
 body {
-  margin: 0;
-  font-family: Helvetica, sans-serif;
-  background-color: #2f073b;
-  color: white;
+    background-image: url('../../assets/imagenes/dibujodigital-de-rocket-league-1920x1080-9e74qx9hejezr8c7.webp');
+    background-size: cover;
+    background-position: center;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
 }
 
-
-.login-box {
-  max-width: 500px;
-  background: rgba(47, 7, 59, 0.9);
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+.login-container {
+    background-color: rgba(255, 255, 255, 0.515);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.144);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
 }
 
-.title {
-  font-family: 'Amarante', serif;
-  font-size: 28px;
-  margin-bottom: 20px;
-  text-align: center;
+h2 {
+    margin-bottom: 20px;
+    color: #333;
 }
 
-.form-control {
-  border-radius: 6px;
-  border: 1px solid #232323;
+.form-group {
+    margin-bottom: 15px;
 }
 
-.btn {
-  background: #cbb4d4;
-  color: #2f073b;
-  font-weight: bold;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+input[type="email"],
+input[type="password"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-.btn:hover {
-  background: #b192c3;
+.login-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
-a {
-  color: #aaa;
-  font-size: 14px;
-  text-decoration: underline;
+.login-btn:hover {
+    background-color: #0056b3;
 }
 
-a:hover {
-  color: white;
+.register-link {
+    margin-top: 15px;
 }
 
-.desktop-view {
-  min-height: 100vh;
-  background: url("../img/gta5.jpeg") no-repeat center center/cover;
+.register-link a {
+    color: #E62727;
+    text-decoration: none;
 }
 
-.mobile-view img {
-  width: 100%;
+.register-link a:hover {
+    text-decoration: underline;
 }

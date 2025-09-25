@@ -1,5 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import verifyToken from '../middlewares/auth.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -29,7 +30,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 }));
 
 // POST /torneo
-router.post('/', asyncHandler(async (req, res) => {
+router.post('/',verifyToken, asyncHandler(async (req, res) => { //Solo los usuarios autenticados pueden crear torneos 
   const { nombre, fecha_inicio, reglas, premios, tipo_torneo, creadorId } = req.body;
   if (!nombre || !fecha_inicio || !creadorId) {
     return res.status(400).json({ error: 'Faltan campos obligatorios: nombre, fecha_inicio, y creadorId.' });
@@ -50,7 +51,7 @@ router.post('/', asyncHandler(async (req, res) => {
 }));
 
 // PUT /torneo/:id
-router.put('/:id', asyncHandler(async (req, res) => {
+router.put('/:id', verifyToken, asyncHandler(async (req, res) => { //Solo los usuarios autenticados pueden actualizar torneos
   const { id } = req.params;
   const { nombre, fecha_inicio, reglas, premios, tipo_torneo, creadorId } = req.body;
   const torneoActualizado = await prisma.torneo.update({
@@ -68,7 +69,7 @@ router.put('/:id', asyncHandler(async (req, res) => {
 }));
 
 // DELETE /torneo/:id
-router.delete('/:id', asyncHandler(async (req, res) => {
+router.delete('/:id',verifyToken, asyncHandler(async (req, res) => { //Solo los usuarios autenticados pueden eliminar torneos 
   const { id } = req.params;
   await prisma.torneo.delete({
     where: { id_torneo: parseInt(id) },
