@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json()); // para leer JSON
 app.use(cors());
 
-app.use(express.static('public')); // Servir archivos estáticos desde la carpeta 'public'
+app.use(express.static('/public')); // Servir archivos estáticos desde la carpeta 'public'
 app.use('/auth', authRoutes); // La ruta quedaria POST /auth/register y POST /auth/login
 
 app.use(logger); // Aplica el middleware a todas las rutas

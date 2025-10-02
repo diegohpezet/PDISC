@@ -13,6 +13,7 @@ export async function MenuDespegable(){
   const div1 = document.createElement("div");
    div1.classList.add("menu-despegable"); // Clase CSS para el menú despegable
    header.append(div1);
+  
   const buttonmenu = document.createElement("button");
    buttonmenu.classList.add("button-menu"); // Clase CSS para el botón del menú
    buttonmenu.textContent = "☰"; // Icono de menú 
@@ -39,13 +40,9 @@ export async function MenuDespegable(){
 
   for(let i=0; i < links.menu.length; i++){
     const li = document.createElement("li"); 
-     
-     // const a = document.createElement("a");
      li.textContent = links.menu[i].nombre;
      li.href = links.menu[i].enlace ; // Asignar la URL del enlace
      li.classList.add("menu-item"); // Clase CSS para los ítems del menú
-    
-     //li.append(a);
      nav.append(li);
   }
  buttonmenu.append(nav);  
